@@ -1,6 +1,7 @@
 <template>
   <div class="konva-wrapper">
-    <button class="add-rect-btn">ADD Rect</button>
+    <button class="btn add-rect-btn" @click="makeRect()">ADD Rect</button>
+    <button class="btn delete-rect-btn" @click="deleteRects()">DELETE Rect</button>
     <v-stage :config="konvaKonfig" class="konva">
       <v-layer>
         <v-line
@@ -18,7 +19,8 @@
           v-for="rect in rects"
           :key="rect.id"
           :config="rect"
-          @clickOnDot="makeLine($event)"
+          @clickOnDot="makeLine"
+          @clickOnRect="clickOnRect"
         />
       </v-layer>
     </v-stage>
@@ -59,13 +61,16 @@ export default {
     ...mapMutations("dragBox", {
       addRect: "ADD_RECT",
       removeSelected: "REMOVE_SELECTED",
-      addLine: "ADD_LINE"
+      addLine: "ADD_LINE",
+      updateRects: "UPDATE_RECTS",
+      removeLine: "REMOVE_LINE"
     }),
 
-    makeRect(x = 200, y = 100) {
+    makeRect(x = 20, y = 20) {
       this.addRect({
         ...rectConfig,
         id: uuid.randomUUID(8),
+        active: false,
         x,
         y
       });
@@ -87,22 +92,46 @@ export default {
       this.addLine({ line, dotsIds });
 
       this.removeSelected();
+    },
+    deleteRects() {
+      let nRects = [];
+      
+      this.rects.map(rect => {
+        if (rect.active) {
+          this.dots[rect.id].map(dot => {
+            dot.line ? this.removeLine(dot.line) : null;
+          });
+        } else nRects.push(rect);
+      });
+
+      this.updateRects(nRects);
+    },
+    clickOnRect({ target }) {
+      const currentRect = this.rects.find(rect => rect.id === target.id());
+      currentRect.active = !currentRect.active;
     }
   },
   computed: {
     ...mapState("dragBox", {
       rects: "RECTS",
       selectedDot: "SELECTED",
-      lines: "LINES"
+      lines: "LINES",
+      dots: "DOTS"
     })
   }
 };
 </script>
 
 <style scoped>
-.add-rect-btn{
+.btn {
   position: absolute;
   top: 20px;
+  font-size: 18px;
+}
+.add-rect-btn {
   left: 50px;
+}
+.delete-rect-btn {
+  left: 200px;
 }
 </style>

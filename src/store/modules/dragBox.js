@@ -13,6 +13,9 @@ const mutations = {
     ADD_RECT(state, payload) {
         state.RECTS.push(payload)
     },
+    UPDATE_RECTS(state, payload){
+        state.RECTS = payload;
+    },
     ADD_DOTS(state, payload) {
         state.DOTS[payload.id] = payload.dots;
     },

@@ -1,6 +1,10 @@
 <template>
   <v-group :config="{draggable:true}" @dragmove="dragHandler">
-    <v-rect :config="config" ref="rect" />
+    <v-rect
+      :config="{...config, stroke: config.active?'red':null}"
+      ref="rect"
+      @click="$emit('clickOnRect', $event)"
+    />
 
     <v-circle
       v-for="(dot,index) in dots[config.id]"
@@ -49,8 +53,8 @@ export default {
       }
     };
   },
-  watch:{
-    lines(){
+  watch: {
+    lines() {
       this.$forceUpdate();
     }
   },
