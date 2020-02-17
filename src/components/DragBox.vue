@@ -2,6 +2,7 @@
   <div class="konva-wrapper">
     <button class="btn add-rect-btn" @click="makeRect()">ADD Rect</button>
     <button class="btn delete-rect-btn" @click="deleteRects()">DELETE Rect</button>
+    <p class="btn counter">rects on board: {{rects.length}}</p>
     <v-stage :config="konvaKonfig" class="konva">
       <v-layer>
         <v-line
@@ -95,7 +96,7 @@ export default {
     },
     deleteRects() {
       let nRects = [];
-      
+
       this.rects.map(rect => {
         if (rect.active) {
           this.dots[rect.id].map(dot => {
@@ -133,5 +134,10 @@ export default {
 }
 .delete-rect-btn {
   left: 200px;
+}
+
+.counter{
+  top: 30px;
+  left: 50px;
 }
 </style>
