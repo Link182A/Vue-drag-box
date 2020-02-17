@@ -1,5 +1,5 @@
 <template>
-  <v-group :config="{draggable:true}">
+  <v-group :config="{draggable:true}" @dragmove="dragHandler">
     <v-rect :config="config" ref="rect" />
 
     <v-circle
@@ -22,7 +22,7 @@
 <script>
 import { mapState, mapMutations } from "vuex";
 import CONSTANTS from "../const";
-import {dotsUtil} from "../utils";
+import { dotsUtil } from "../utils";
 
 export default {
   props: {
@@ -49,10 +49,19 @@ export default {
       }
     };
   },
+  watch:{
+    lines(){
+      this.$forceUpdate();
+    }
+  },
   methods: {
     ...mapMutations("dragBox", {
       addDots: "ADD_DOTS",
-      changeDotsState: "ACTIVE_DOTS_HANDLER"
+      changeDotsState: "ACTIVE_DOTS_HANDLER",
+      removeSelected: "REMOVE_SELECTED",
+      addSelected: "ADD_SELECTED",
+      updateLines: "UPDATE_LINES",
+      removeLine: "REMOVE_LINE"
     }),
     makeDots() {
       this.addDots({
@@ -67,18 +76,53 @@ export default {
       e.target.radius(this.circleConfig.radius).parent.parent.draw();
     },
     handleClick(e, index) {
+      const dotID = e.target.id();
+      const dot = this.dots[this.config.id].find(dot => dot.id === dotID);
+
+      const dotObj = {
+        target: e.target,
+        parent: this.config.id,
+        dot: dotID,
+        index
+      };
+
+      if (dot.line) {
+        this.removeLine(dot.line);
+        return;
+      } else if (this.selectedDot) {
+        if (this.selectedDot.dot === dotID) {
+          this.removeSelected();
+        } else {
+          this.$emit("clickOnDot", dotObj);
+        }
+      } else {
+        this.addSelected(dotObj);
+      }
+
       this.changeDotsState({
         id: this.config.id,
-        dotId: index,
-        state: !this.dots[this.config.id].find(dot => dot.id === e.target.id()).active
+        dotIndex: index,
+        state: !dot.active
       });
+
       this.$forceUpdate();
-      
+    },
+    dragHandler() {
+      const lines = this.lines.map(line => {
+        return {
+          ...line,
+          from: line.dots[0].target.absolutePosition(),
+          to: line.dots[1].target.absolutePosition()
+        };
+      });
+      this.updateLines(lines);
     }
   },
   computed: {
     ...mapState("dragBox", {
-      dots: "DOTS"
+      dots: "DOTS",
+      selectedDot: "SELECTED",
+      lines: "LINES"
     })
   }
 };
