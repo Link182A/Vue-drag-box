@@ -67,7 +67,7 @@ export default {
       removeLine: "REMOVE_LINE"
     }),
 
-    makeRect(x = 20, y = 20) {
+    makeRect(x = 20 * this.rects.length, y = 20 * this.rects.length) {
       this.addRect({
         ...rectConfig,
         id: uuid.randomUUID(8),
@@ -136,7 +136,7 @@ export default {
   left: 200px;
 }
 
-.counter{
+.counter {
   top: 30px;
   left: 50px;
 }
