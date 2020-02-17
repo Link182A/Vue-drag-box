@@ -67,7 +67,7 @@ export default {
       removeLine: "REMOVE_LINE"
     }),
 
-    makeRect(x = 20 * this.rects.length, y = 20 * this.rects.length) {
+    makeRect(x = 20 * this.rects.length+1, y = 20 * this.rects.length+1) {
       this.addRect({
         ...rectConfig,
         id: uuid.randomUUID(8),
